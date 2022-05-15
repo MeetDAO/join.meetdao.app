@@ -6,8 +6,7 @@ import { useState } from "react";
 import Address from "../Address/Address";
 import { SelectOutlined } from "@ant-design/icons";
 import { getExplorer } from "helpers/networks";
-import Text from "antd/lib/typography/Text";
-import { connectors } from "./config";
+
 const styles = {
   account: {
     height: "42px",
@@ -21,6 +20,7 @@ const styles = {
     cursor: "pointer",
   },
   text: {
+    margin: "0",
     color: "#21BF96",
   },
   connector: {
@@ -47,59 +47,44 @@ function Account() {
   const { authenticate, isAuthenticated, account, chainId, logout } =
     useMoralis();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isAuthModalVisible, setIsAuthModalVisible] = useState(false);
+  const loginHandler = async () => {
+    try {
+      await authenticate({
+        provider: "web3Auth",
+        clientId:
+          "BGiRNSwNmROGHGkdO1l2JcasV3bHVS0sNC6qXa-zmBV_5rqGirqjynhwAYdbZvTpbYmNDPe9NDl12uYM984Rz38",
+        appLogo: "./logo.png",
+        loginMethodsOrder: [
+          "google",
+          "facebook",
+          "twitter",
+          "kakao",
+          "line",
+          "github",
+          "linkedin",
+          "discord",
+          "twitch",
+          "apple",
+          "reddit",
+          "weibo",
+          "wechat",
+          "email_passwordless",
+        ],
+        theme: "light",
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   if (!isAuthenticated || !account) {
     return (
-      <>
-        <div onClick={() => setIsAuthModalVisible(true)}>
-          <p style={styles.text}>Authenticate</p>
-        </div>
-        <Modal
-          visible={isAuthModalVisible}
-          footer={null}
-          onCancel={() => setIsAuthModalVisible(false)}
-          bodyStyle={{
-            padding: "15px",
-            fontSize: "17px",
-            fontWeight: "500",
-          }}
-          style={{ fontSize: "16px", fontWeight: "500" }}
-          width="340px"
-        >
-          <div
-            style={{
-              padding: "10px",
-              display: "flex",
-              justifyContent: "center",
-              fontWeight: "700",
-              fontSize: "20px",
-            }}
-          >
-            Connect Wallet
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
-            {connectors.map(({ title, icon, connectorId }, key) => (
-              <div
-                style={styles.connector}
-                key={key}
-                onClick={async () => {
-                  try {
-                    await authenticate({ provider: connectorId });
-                    window.localStorage.setItem("connectorId", connectorId);
-                    setIsAuthModalVisible(false);
-                  } catch (e) {
-                    console.error(e);
-                  }
-                }}
-              >
-                <img src={icon} alt={title} style={styles.icon} />
-                <Text style={{ fontSize: "14px" }}>{title}</Text>
-              </div>
-            ))}
-          </div>
-        </Modal>
-      </>
+      <div
+        style={{ cursor: "pointer", padding: "0 10px" }}
+        onClick={loginHandler}
+      >
+        <p style={styles.text}>Authenticate</p>
+      </div>
     );
   }
 
